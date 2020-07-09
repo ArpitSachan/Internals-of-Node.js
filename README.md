@@ -17,9 +17,9 @@
 ## Node.js Working
 
 * **V8 dependency:**  open source JS engine created by google, to execute JS code outside of the browser. V8 translates js stuffs into c++.
-* **Libuv Dependency:** C++ open source project gives node access to the OS underlying file system, netorking also handles some kind of concurrency, 
+* **Libuv Dependency:** C++ open source project gives node access to the OS underlying file system, netorking also handles some kind of concurrency.
 * **Purpose of NodeJS:** gives us interface to relate our JS side of our application to the actual c++ that’s running on our computer interpret and execute our JS code. It also provides a series of wrappers and a very unified inconsistent API for us to use inside our projects.
-* **Lib** folder keeps all the Javascript implemntation.
+* **Lib** folder keeps all the Javascript implemntations.
 * **Src** folder keeps c++ implementation of all the functions.
 * **Process.binding()**  connects JS and C++ functions.
  </br>
@@ -27,9 +27,9 @@
  ## Event loop working
  
 * **A Process** is an instance of computer programm that is being executed.
-* Within a single process we can have multiple thread.
+* Within a single process we can have multiple threads.
 * **Thread has** some instructions that has to be run by cpu (one by one).
-* If we have more than one core inside our cpus we can process multiple threas at a time.
+* If we have more than one core inside our cpus we can process multiple threads at a time.
 * Whenever you start a node code it automatically creates a thread and then executes the code inside that one thread.
 * **Event loop** is like a control structure, decides what a thread should be doing at a given point of time.
 * Node event loop is **single threaded** however some of Node framework std lib function that we run outside of event loop are not single thread.
@@ -71,7 +71,7 @@ while(shouldContinue()){ // event loop
 
 
 ## Flow chart of How does a node.js code works?
-*refer to further topics for better understanding*
+*Refer to further topics for better understanding*
 
 <img src="https://github.com/ArpitSachan/Node.js/blob/master/Screenshot%20(299).png" width=400>
 
@@ -96,13 +96,13 @@ while(shouldContinue()){ // event loop
 	Output: 1: 1001, 2: 1012
 	  this output should have been 1:1001, 2:2000(approximately) if node was actually single threaded.
 
-* This happens because libuv c++ side decides to run some computational functions ouside the even loop. They use ThreadPool(series of four threads to run comuptational tasks.)
-* So four threads handle offloading work of expensive calculations outside the event loop.
-* But if you use 5 pbkdf2 function ouptut will be like 1: 1750 2:1778 3:1781 4:1784 **5:2661**
+* This happens because **libuv c++** side decides to run some computational functions ouside the event loop. They use **ThreadPool**(series of four threads to run comuptational tasks.)
+* So **four threads handle** offloading work of expensive calculations outside the event loop.
+* But if you use **5 pbkdf2** function ouptut will be like 1: 1750 2:1778 3:1781 4:1784 **5:2661**
 * We can write custom JS codes that uses the thread pool.
-* All 'fs' module functions use the threadpool.
-* If you see above figure 2 functions are being assigned to a single core that's why it is taking more time to complete task 1,2,3,4 than in two functions case as cpu core has to do twice as work. When all these four function get completed 5th function gets added to thread pool. Below image explains the same thing.
-* We can change threadpool size using process.env.UV_THREADPOOL_SIZE = 2;
+* All **'fs' module** functions use the threadpool.
+* If you see above figure 2 functions are being assigned to a single core that's why it is taking more time to complete task 1,2,3,4 than in **two functions case** as cpu core has to do twice as work. When all these four function get completed 5th function gets added to thread pool. Below image explains the same thing.
+* We can change threadpool size using ```process.env.UV_THREADPOOL_SIZE = 2;```
 <img src="https://github.com/ArpitSachan/Node.js/blob/master/Screenshot%20(297).png" width=300>
 
 </br>
@@ -135,14 +135,14 @@ while(shouldContinue()){ // event loop
   ```
 	OUTPUT : 334 341 342 348 376 382 (NOT USING THREADS).
   ```
- * Instead libUV delegates the request making to the underlying operating system, So it's actually our operating system that does the real HTTP request Libby is used to issue the request and then it just waits on the operating system to emit a signal that some response has come back to.
+ * Instead libUV delegates the request making to the underlying operating system, So it's actually our operating system that does the real HTTP request libUV is used to issue the request and then it just waits on the operating system to emit a signal that some response has come back to.
  * Everything around netorking uses underlying OS, os's async feature
  
  </br>
  
  
  ## Multitasking: Putting everything together
- *If we all the codes together as*
+ *If we put all the codes together as*
  
  ```javascript
  	const https = require('https');
@@ -185,5 +185,5 @@ HASH:1596
 HASH:1598
 HASH:1609
  ```
- * If we remove all the hash functions from the above code the file reading from ahrd drive(fs.readfile) shows output FS:28(very fast) but if we add hash functions the what's happening here?
- * Everything inside FS module uses Thredpool. But still how does 5 thread(threadpool has 4 threads only) calls are showing same time, that's beacause when FS fuction goes to thread it make request to Hard rive for file access and then thread frees the FS function until the HD request gets completed and asign that thread to remained HASH function and when one of any hash function gets completed that spot gets asinged to FS function and as we know FS function complete quickly, So that's why **one HASH function got completed before FS**  but if we increase our threadpool size then FS will completed quickly. And if we use 1 then all the hash functions will complete beforeb fs.
+ * If we remove all the hash functions from the above code the file reading from hard drive **(fs.readfile)** shows output **FS:28(very fast)** but if we add hash functions then what's happening here?
+ * Everything inside **FS module uses Thredpool**. But still how does 5 thread(threadpool has 4 threads only) calls are showing same time, that's beacause when FS fuction goes to thread it make request to Hard drive for file access and then thread frees the FS function until the HD request gets completed and asign that thread to remained HASH function and when one of any hash function gets completed that spot gets asinged to FS function and as we know FS function complete quickly, So that's why **one HASH function got completed before FS**  but if we increase our threadpool size then FS will completed quickly. And if we use 1 then all the hash functions will complete beforeb fs.
