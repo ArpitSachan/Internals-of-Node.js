@@ -10,6 +10,7 @@
 | 04. |[Thread Testing](#thread-testing)|
 | 05. |[Operating system's Async Feature](#operating-systems-async-feature)|
 | 06. |[Multitasking: Putting everything together](#multitasking-putting-everything-together)|
+| 07. |[Enhancing node performance](#enhancing-node-performance)|
 
 </br>
 
@@ -187,3 +188,78 @@ HASH:1609
  ```
  * If we remove all the hash functions from the above code the file reading from hard drive **(fs.readfile)** shows output **FS:28(very fast)** but if we add hash functions then what's happening here?
  * Everything inside **FS module uses Thredpool**. But still how does 5 thread(threadpool has 4 threads only) calls are showing same time, that's beacause when FS fuction goes to thread it make request to Hard drive for file access and then thread frees the FS function until the HD request gets completed and asign that thread to remained HASH function and when one of any hash function gets completed that spot gets asinged to FS function and as we know FS function complete quickly, So that's why **one HASH function got completed before FS**  but if we increase our threadpool size then FS will completed quickly. And if we use 1 then all the hash functions will complete beforeb fs.
+ 
+ </br>
+ 
+ 
+ ## Enhancing node performance
+ * Two ways to improve node performanc.
+	**a.** Use Node in 'Cluster' mode
+	**b.** Use worker Threads.
+	
+ * **Blocking Event loop:** 
+	```javascript
+	const express = require('express');
+	
+	const app =express();
+	
+	function doWork(duration){
+	  const start= Date.now();
+	  while(Date.now()-start<duration){}
+	}
+	
+	app.get('/', (req, res)=>{
+	  doWork(5000);
+	  res.send('Hellp, World!');
+	});
+	
+	app.listen(3000);
+	```
+ * **doWork function** contains a while loop which runs for 5 seconds(does nothing), since event loop is single threaded, so our app will do nothing for 5 seconds(or will take 5 secons to load), It means one single tiny function is blocking our event loop.
+	                            Since our event loop is blocked, So,if we try to run our app in two different tabs one after another, later will wait for first request to complete, See the time difference in below image.	
+ * Clearly effect of very long running or computational intensive code inside a node project is not ideal at all.
+ 
+ </br>
+ 
+ 
+ ## Clustering
+  * Clustering is used to handle event blocking situation. Below diagrams explain the working of clustering.
+  
+       <img src="https://github.com/ArpitSachan/Inside-Node.js/blob/master/Screenshot%20(306).png" width=300>          <img src="https://github.com/ArpitSachan/Inside-Node.js/blob/master/Screenshot%20(307).png" width=300> 
+  
+       ```javascript
+	const cluster=require('cluster');
+	
+	// console.log(cluster.isMaster);
+	
+	// Is the file being executed in master mode? Checking if we have to go to cluster manger or if we are coming from cluster.fork() (Explained in above figure) and we have to go to Worker instance.
+	if(cluster.isMaster){
+	  //Cause index.js to be executed again but in child mode
+	cluster.fork();
+	cluster.fork();
+	cluster.fork();
+	cluster.fork();
+	}else{
+	
+	  //Im a child I'm going to act like a server and do nopthing
+	const express = require('express');
+	
+	const app =express();
+	
+	function doWork(duration){
+	  const start= Date.now();
+	  while(Date.now()-start<duration){}
+	}
+	
+	app.get('/', (req, res)=>{
+	  doWork(5000);
+	  res.send('Hellp, World!');
+	});
+	
+	app.get('/fast', (req, res)=>{
+	  res.send('Hellp, Flash World!');
+	});
+	app.listen(3000);
+	}
+      ```
+ *  Above we used multiple **cluster.fork()** and created a new route **'/fast'** and if we try to run **'localhost:3000'** and **localhost:3000/fast** simultaneously, we will see that **localhost:3000/fast** runs quickly while localhost:3000 takes 5 seconds(since it has a function call which runs for five seconds). So that's how clustering avoids event loop blocking. And if we use just one **cluster.fork()** then again both routes will take some time to process. 
