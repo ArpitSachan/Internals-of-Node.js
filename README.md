@@ -8,7 +8,7 @@
 | 02. |[Event loop working](#event-loop-working)|
 | 03. |[Flow chart of How does a node.js code works?](#flow-chart-of-how-does-a-nodejs-code-works)|
 | 04. |[Thread Testing](#thread-testing)|
-| 05. |[Operating system's Async Feature](#operating-systems-async-feature)|
+| 05. |[Node's Asynchronous Feature](#nodes-asynchronous-feature)|
 | 06. |[Multitasking: Putting everything together](#multitasking-putting-everything-together)|
 | 07. |[Enhancing node performance](#enhancing-node-performance)|
 
@@ -109,7 +109,7 @@ while(shouldContinue()){ // event loop
 </br>
 
 
-## Operating system's Async Feature
+## Node's Asynchronous Feature
 * It makes all the requests in same time.
 	```javascript
   const https = require('https');
@@ -139,6 +139,34 @@ while(shouldContinue()){ // event loop
  * Instead libUV delegates the request making to the underlying operating system, So it's actually our operating system that does the real HTTP request libUV is used to issue the request and then it just waits on the operating system to emit a signal that some response has come back to.
  * Everything around netorking uses underlying OS, os's async feature
  
+ * Node.js is non-blocking I/O, non-blocking means it continues to do other tasks while it is renering ata from some task. One task doesn't block other.
+ * Asynchornous programming node.js keep doing other tasks while another task is taking time in fetching some data refer below:
+	```javascript
+	console.log('Starting');
+	
+	setTimeout(()=>{
+	  console.log('2 sec timer');
+	}, 2000)
+	
+	setTimeout(()=> {
+	  console.log('0 sec timer');
+	}, 0)
+	
+	console.log('Stopping');
+	
+	OUTPUT: 
+	Starting
+	Stopping
+	0 sec timer
+	2 sec timer
+	`
+	
+ * **Call Stack** keeps all the running  functions starting from main function in a stack.
+
+ * Why does 0 seconds timer is printing after 'Stopping' log because functions like setTimeout use **Node's API** to proceed when such funtions get added to call stack they move to Node's API where they complete their time/task and move to **Callback queue** inside **Event loop** but we cannot add task from callback queue to Call stack until call stack is empty, And now our Call stack has main function in it, our code will proceed ahead and print 'Stopping' log, the log will be removed and after that the main function will be removed from stack, now stack is empty, So it will start taking functions from Callback Queue.
+ 
+      <img src="https://user-images.githubusercontent.com/29403783/88421543-5e926700-ce06-11ea-95a7-9d76912b323a.png" width =600>
+
  </br>
  
  
