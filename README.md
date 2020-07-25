@@ -11,6 +11,7 @@
 | 05. |[Node's Asynchronous Feature](#nodes-asynchronous-feature)|
 | 06. |[Multitasking: Putting everything together](#multitasking-putting-everything-together)|
 | 07. |[Enhancing node performance](#enhancing-node-performance)|
+| 08. |[The Callback Function](#the-callback-function)|
 
 </br>
 
@@ -291,3 +292,63 @@ HASH:1609
 	}
       ```
  *  Above we used multiple **cluster.fork()** and created a new route **'/fast'** and if we try to run **'localhost:3000'** and **localhost:3000/fast** simultaneously, we will see that **localhost:3000/fast** runs quickly while localhost:3000 takes 5 seconds(since it has a function call which runs for five seconds). So that's how clustering avoids event loop blocking. And if we use just one **cluster.fork()** then again both routes will take some time to process. 
+ 
+ 
+ ## The Callback Function
+ 
+ * If we look at function below
+ 
+ ```javascript
+ const add =(x, y)=>{
+  setTimeout(()=>{
+    console.log('Two sec later')
+    return (x+y)
+  }, 2000)
+}
+
+
+const sum=add(1, 4)
+console.log(sum);
+
+ ```
+ ```
+ OUTPUT: 
+ undefined
+ Two sec later
+ ```
+ We see that above function is showing ```undefined``` output in place of sum of two numbers, that's because what has been explained in **Call stack** working section of [Node's Asynchronous Feature](#nodes-asynchronous-feature) but how can we get the get the sum here is using **The Callback Function: A callback is a function called at the completion of a given task; this prevents any blocking, and allows other code to be run in the meantime.** 
+ 
+ ```
+ const add =(x, y, callback)=>{
+  setTimeout(()=>{
+    callback(x+y)
+  }, 2000)
+}
+
+
+add(1, 4, (sum) => {
+    console.log(sum) // Should print: 5
+})
+
+ ```
+```
+OUTPUT
+5
+```
+* **Callback chaining example: **
+
+```javascript
+geocode(location, (error, {latitutde, longitude, location} ={})=>{
+  if(error){
+    return console.log(error);
+  }
+  forecast(latitutde, longitude, (error, forecastData) => {
+    if(error){
+      return console.log(error);
+
+    }
+    console.log(location)
+    console.log(forecastData)
+  })
+})
+```
