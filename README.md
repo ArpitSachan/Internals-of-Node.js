@@ -318,7 +318,7 @@ console.log(sum);
  ```
  We see that above function is showing ```undefined``` output in place of sum of two numbers, that's because what has been explained in **Call stack** working section of [Node's Asynchronous Feature](#nodes-asynchronous-feature) but how can we get the get the sum here is using **The Callback Function: A callback is a function called at the completion of a given task; this prevents any blocking, and allows other code to be run in the meantime.** 
  
- ```
+ ```javascript
  const add =(x, y, callback)=>{
   setTimeout(()=>{
     callback(x+y)
