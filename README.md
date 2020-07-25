@@ -335,7 +335,7 @@ add(1, 4, (sum) => {
 OUTPUT
 5
 ```
-* **Callback chaining example: **
+* **Callback chaining example:**
 
 ```javascript
 geocode(location, (error, {latitutde, longitude, location} ={})=>{
