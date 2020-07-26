@@ -12,6 +12,7 @@
 | 06. |[Multitasking: Putting everything together](#multitasking-putting-everything-together)|
 | 07. |[Enhancing node performance](#enhancing-node-performance)|
 | 08. |[The Callback Function](#the-callback-function)|
+| 08. |[Promises](#promises)|
 
 </br>
 
@@ -350,5 +351,34 @@ geocode(location, (error, {latitutde, longitude, location} ={})=>{
     console.log(location)
     console.log(forecastData)
   })
+})
+```
+
+</br>
+
+## Promises
+It allows to associate handlers to an asynchronous action's eventual success value or failure reason. This lets asynchronous methods return values like synchronous methods: instead of the final value, the asynchronous method returns a promise for the value at some point in the future.
+
+Promises in node.js promised to do some work and then had separate callbacks that would be executed for success and failure as well as handling timeouts. Another way to think of promises in node.js was that they were emitters that could emit only two events: success and error.The cool thing about promises is you can combine them into dependency chains (do Promise C only when Promise A and Promise B complete).
+
+The core idea behind promises is that a promise represents the result of an asynchronous operation. A promise is in one of three different states:
+
+pending - The initial state of a promise.
+fulfilled - The state of a promise representing a successful operation.
+rejected - The state of a promise representing a failed operation. Once a promise is fulfilled or rejected, it is immutable (i.e. it can never change again).
+
+* **Node.js promise expample**
+```javascript
+const doWorkPromise= new Promise((resolve, reject)=>{
+  setTimeout(()=>{
+    // resolve([1, 6, 7])
+    reject('Things went wrong')
+  },2000)
+})
+
+doWorkPromise.then((result)=>{
+  console.log(result);
+}).catch((e)=>{
+  console.log('Error!', e);
 })
 ```
